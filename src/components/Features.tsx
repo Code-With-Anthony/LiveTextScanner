@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/cards";
+} from "@/components/ui/card";
 import { Camera, FileText, Languages, Zap, Cloud, Lock } from "lucide-react";
 
 const Features = () => {
