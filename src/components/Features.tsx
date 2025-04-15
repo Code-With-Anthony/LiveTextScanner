@@ -48,7 +48,7 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="section-padding bg-white">
+    <section className="section-padding bg-white" id="features">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">

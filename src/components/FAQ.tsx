@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { memo } from "react";
 
 const FAQ = () => {
   const faqs = [
@@ -49,6 +50,25 @@ const FAQ = () => {
     },
   ];
 
+  const FaqItem = memo(
+    ({
+      index,
+      question,
+      answer,
+    }: {
+      index: number;
+      question: string;
+      answer: string;
+    }) => (
+      <AccordionItem value={`item-${index}`}>
+        <AccordionTrigger className="text-left cursor-pointer">
+          <h3 className="text-base md:text-lg font-medium">{question}</h3>
+        </AccordionTrigger>
+        <AccordionContent>{answer}</AccordionContent>
+      </AccordionItem>
+    )
+  );
+
   return (
     <section id="faq" className="section-padding bg-white">
       <div className="container px-4 md:px-6">
@@ -68,12 +88,12 @@ const FAQ = () => {
         <div className="mx-auto max-w-3xl pt-12">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
-              </AccordionItem>
+              <FaqItem
+                key={index}
+                index={index}
+                question={faq.question}
+                answer={faq.answer}
+              />
             ))}
           </Accordion>
         </div>

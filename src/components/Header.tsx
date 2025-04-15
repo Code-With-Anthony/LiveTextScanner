@@ -1,15 +1,41 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNavClick = (href: string) => {
+    setMobileMenuOpen(false);
+    navigate(href);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const navLinks = [
+    { label: "Features", href: "/features" },
+    { label: "How It Works", href: "/how-it-works" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Testimonials", href: "/testimonials" },
+    { label: "FAQ", href: "/faq" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-2">
-          <div className="flex items-center text-primary font-bold text-xl">
+          <button
+            onClick={() => handleNavClick("/")}
+            className="flex items-center text-primary font-bold text-xl"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -25,40 +51,19 @@ const Header = () => {
               <path d="m9 16 2 2 4-4" />
             </svg>
             TextPeek
-          </div>
+          </button>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a
-            href="#features"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Features
-          </a>
-          <a
-            href="#how-it-works"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            How It Works
-          </a>
-          <a
-            href="#pricing"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Pricing
-          </a>
-          <a
-            href="#testimonials"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Testimonials
-          </a>
-          <a
-            href="#faq"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            FAQ
-          </a>
+          {navLinks.map((link) => (
+            <button
+              key={link.href}
+              onClick={() => handleNavClick(link.href)}
+              className="text-sm font-medium hover:text-primary transition-colors hover:cursor-pointer"
+            >
+              {link.label}
+            </button>
+          ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -67,6 +72,7 @@ const Header = () => {
         </div>
 
         <button
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           className="md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
@@ -77,41 +83,15 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="md:hidden py-4 px-4 bg-background border-b">
           <nav className="flex flex-col space-y-4">
-            <a
-              href="#features"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Features
-            </a>
-            <a
-              href="#how-it-works"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              How It Works
-            </a>
-            <a
-              href="#pricing"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Pricing
-            </a>
-            <a
-              href="#testimonials"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Testimonials
-            </a>
-            <a
-              href="#faq"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              FAQ
-            </a>
+            {navLinks.map((link) => (
+              <button
+                key={link.href}
+                onClick={() => handleNavClick(link.href)}
+                className="text-sm text-left font-medium hover:text-primary transition-colors"
+              >
+                {link.label}
+              </button>
+            ))}
             <div className="flex flex-col space-y-2 pt-2">
               <Button variant="outline" className="w-full">
                 Log in
