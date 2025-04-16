@@ -6,11 +6,21 @@ import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import Pricing from "@/components/Pricing";
 import Testimonials from "@/components/Testimonials";
+import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Index = ({ section }: { section?: string }) => {
   const location = useLocation();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is logged in, redirect to dashboard
+    if (!loading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (section) {
