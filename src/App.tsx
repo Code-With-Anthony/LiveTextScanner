@@ -8,6 +8,7 @@ import Auth from "./pages/auth/Auth";
 import AuthCallback from "./pages/auth/AuthCallback";
 import Dashboard from "./pages/dashboard/Dashboard";
 import NotFound from "./pages/NotFound";
+import Page from "./components/dashboard/page";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Page />} />
             <Route path="/features" element={<Index section="features" />} />
             <Route
               path="/how-it-works"
