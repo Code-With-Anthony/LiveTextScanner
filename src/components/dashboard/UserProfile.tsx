@@ -68,6 +68,9 @@ export default function UserProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [scansUsed, setScansUsed] = useState<number>(0);
+  const [scansLeft, setScansLeft] = useState<number>(0);
+
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -104,6 +107,7 @@ export default function UserProfile() {
           .select(
             `
           status,
+          starts_at,
           expires_at,
           subscription_plans(
             name,
@@ -119,6 +123,24 @@ export default function UserProfile() {
       if (subscriptionError && subscriptionError.code !== "PGRST116") {
         // PGRST116 is the error code for "No rows returned"
         throw subscriptionError;
+      }
+
+      // fetch scan usage
+      const { count: scanCount, error: scanCountError } = await supabase
+        .from("scan_history")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .gte("created_at", subscriptionData?.starts_at); // or figure out period start
+
+      if (scanCountError) {
+        console.error("Failed to fetch scan usage:", scanCountError);
+      }
+
+      if (scanCount !== null && subscriptionData) {
+        setScansUsed(scanCount);
+        setScansLeft(
+          subscriptionData.subscription_plans.scan_limit - scanCount
+        );
       }
 
       if (profileData) {
@@ -194,6 +216,11 @@ export default function UserProfile() {
     }
   };
 
+  const firstNamePlaceholder = user?.user_metadata?.full_name?.split(" ")[0];
+  const lastNamePlaceholder = user?.user_metadata?.full_name?.split(" ")[1];
+
+  console.log("subscription: ", subscription);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -223,7 +250,10 @@ export default function UserProfile() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your first name" {...field} />
+                            <Input
+                              placeholder={firstNamePlaceholder}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -236,7 +266,10 @@ export default function UserProfile() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your last name" {...field} />
+                            <Input
+                              placeholder={lastNamePlaceholder}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -281,6 +314,15 @@ export default function UserProfile() {
                           {subscription.scan_limit.toLocaleString()} scans
                           {" • "}${subscription.price}/month
                         </div>
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          {/* Monthly limit:{" "}
+                          {subscription.scan_limit.toLocaleString()} scans
+                          {" • "} */}
+                          Used: {scansUsed} scans
+                          {" • "}
+                          Left: {scansLeft} scans
+                        </div>
+
                         <div className="mt-1 text-sm text-muted-foreground">
                           Expires:{" "}
                           {new Date(

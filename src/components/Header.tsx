@@ -7,9 +7,9 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, tab?: "login" | "signup") => {
     setMobileMenuOpen(false);
-    navigate(href);
+    navigate(href, { state: tab ? { tab } : {} });
   };
 
   useEffect(() => {
@@ -67,8 +67,15 @@ const Header = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="outline">Log in</Button>
-          <Button className="btn-shine">Get Started</Button>
+          <Button variant="outline" onClick={() => handleNavClick("/auth")}>
+            Log in
+          </Button>
+          <Button
+            className="btn-shine"
+            onClick={() => handleNavClick("/auth", "signup")}
+          >
+            Get Started
+          </Button>
         </div>
 
         <button
@@ -93,10 +100,15 @@ const Header = () => {
               </button>
             ))}
             <div className="flex flex-col space-y-2 pt-2">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" onClick={() => handleNavClick("/auth")}>
                 Log in
               </Button>
-              <Button className="w-full">Get Started</Button>
+              <Button
+                className="btn-shine"
+                onClick={() => handleNavClick("/auth", "signup")}
+              >
+                Get Started
+              </Button>
             </div>
           </nav>
         </div>

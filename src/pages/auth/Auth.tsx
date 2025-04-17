@@ -1,11 +1,4 @@
-import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Navigate } from "react-router-dom";
-import { Github } from "lucide-react";
-
-import { useAuth } from "@/hooks/use-auth";
+import { PasswordField } from "@/components/PasswordField";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -24,29 +16,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
-
-const signupSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
-  email: z.string().email({ message: "Please enter a valid email" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
+import { useAuth } from "@/hooks/use-auth";
+import { loginSchema } from "@/schema/auth/loginSchema";
+import { signupSchema } from "@/schema/auth/signupSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Github } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Navigate, useLocation } from "react-router-dom";
+import { z } from "zod";
 
 export default function Auth() {
+  const location = useLocation();
+  const tabFromState = location.state?.tab as "login" | "signup" | undefined;
   const { user, loading, signIn, signUp, signInWithGoogle, signInWithGithub } =
     useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
+  const [activeTab, setActiveTab] = useState<"login" | "signup">(
+    tabFromState ?? "login"
+  );
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -63,6 +53,7 @@ export default function Auth() {
       lastName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -135,7 +126,14 @@ export default function Auth() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs
+              value={activeTab}
+              onValueChange={(val: string) => {
+                if (val === "login" || val === "signup") {
+                  setActiveTab(val);
+                }
+              }}
+            >
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -159,22 +157,10 @@ export default function Auth() {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={loginForm.control}
+                    <PasswordField
+                      form={loginForm}
                       name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Password"
                     />
                     <Button
                       type="submit"
@@ -233,22 +219,10 @@ export default function Auth() {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={signupForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <PasswordField
+                      form={signupForm}
+                      name="confirmPassword"
+                      label="Confirm Password"
                     />
                     <Button
                       type="submit"

@@ -25,6 +25,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return user.email?.charAt(0).toUpperCase() || "U";
   };
 
+  const fullName =
+    user?.user_metadata?.full_name ??
+    `${user?.user_metadata?.first_name ?? ""} ${
+      user?.user_metadata?.last_name ?? ""
+    }`.trim();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b">
@@ -51,9 +57,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm hidden md:inline">{user?.email}</span>
+              <span className="text-sm hidden md:inline">
+                {user?.user_metadata?.full_name || fullName || user?.email}
+              </span>
               <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt={user?.email || "User"} />
+                <AvatarImage
+                  src={user?.user_metadata?.avatar_url}
+                  alt={user?.email || "User"}
+                />
                 <AvatarFallback>{getInitials()}</AvatarFallback>
               </Avatar>
             </div>

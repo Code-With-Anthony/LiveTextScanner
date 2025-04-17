@@ -1,6 +1,7 @@
 import { Facebook, Github, Instagram, Linkedin, Twitter } from "lucide-react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="bg-slate-900 text-slate-50">
       <div className="container px-4 md:px-6 py-16">
@@ -144,7 +145,7 @@ const Footer = () => {
         <div className="mt-10 border-t border-slate-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <p className="text-center text-sm text-slate-400">
-              © 2025 TextPeek. All rights reserved.
+              © {currentYear} TextPeek. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-slate-400">
               <a href="#" className="hover:text-primary">

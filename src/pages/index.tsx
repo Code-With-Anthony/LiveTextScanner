@@ -26,7 +26,6 @@ const Index = ({ section }: { section?: string }) => {
     if (section) {
       const element = document.getElementById(section);
       if (element) {
-        console.log("element: ", element);
         element.scrollIntoView({ behavior: "smooth" });
       }
     } else {
