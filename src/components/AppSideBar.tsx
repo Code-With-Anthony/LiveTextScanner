@@ -13,6 +13,7 @@ import {
   SearchIcon,
   SettingsIcon,
   UsersIcon,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import * as React from "react";
 
@@ -41,7 +42,7 @@ const sidebarContentFree = {
     { title: "History", url: "/scan-history", icon: ClipboardListIcon },
   ],
   documents: [
-    { name: "Reports", url: "/reports", icon: ClipboardListIcon },
+    { name: "Analytics", url: "/analytics", icon: ChartNoAxesCombined },
     { name: "Subscriptions", url: "/subscription", icon: DollarSignIcon },
   ],
   ai: [
