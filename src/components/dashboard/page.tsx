@@ -1,29 +1,29 @@
 import { AppSidebar } from "@/components/AppSideBar";
-import { ChartAreaInteractive } from "@/components/ChartAreaInteractive";
-import { DataTable } from "@/components/DataTable";
-import { SectionCards } from "@/components/SectionCards";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
-import data from "./data.json";
+import { useAuth } from "@/hooks/use-auth";
+import { Navigate, Outlet } from "react-router-dom";
 
 export default function Page() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="sidebar" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
-              <DataTable data={data} />
-            </div>
-          </div>
-        </div>
+        <Outlet />
       </SidebarInset>
     </SidebarProvider>
   );

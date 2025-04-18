@@ -102,7 +102,7 @@ export default function ScanHistory() {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-2xl">Scan History</CardTitle>
+            <CardTitle className="text-2xl">Previous Scans</CardTitle>
             <CardDescription>
               View and manage your previous text scans
             </CardDescription>

@@ -1,23 +1,20 @@
 "use client";
 
-import * as React from "react";
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
   CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
+  DollarSignIcon,
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  ListIcon,
   SearchIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
+import * as React from "react";
 
 import { NavDocuments } from "@/components/NavDocuments";
 import { NavMain } from "@/components/NavMain";
@@ -32,127 +29,102 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
+import { useUserData } from "@/hooks/useUserData";
+import { NavAI } from "./NavAI";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+// Sidebar content for Free Plan
+const sidebarContentFree = {
   navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: ListIcon,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: BarChartIcon,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: FolderIcon,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: UsersIcon,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
-    },
+    { title: "Dashboard", url: "", icon: LayoutDashboardIcon },
+    { title: "Scan Now", url: "/scan", icon: CameraIcon },
+    { title: "History", url: "/scan-history", icon: ClipboardListIcon },
   ],
   documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: DatabaseIcon,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: FileIcon,
-    },
+    { name: "Reports", url: "/reports", icon: ClipboardListIcon },
+    { name: "Subscriptions", url: "/subscription", icon: DollarSignIcon },
+  ],
+  ai: [
+    { name: "Chat With Doc", url: "/reports", icon: ClipboardListIcon },
+    { name: "Explore AI Models", url: "/subscription", icon: DollarSignIcon },
+  ],
+  navSecondary: [
+    { title: "Settings", url: "/settings", icon: SettingsIcon },
+    { title: "Get Help", url: "/help", icon: HelpCircleIcon },
+  ],
+};
+
+// Sidebar content for Pro Plan
+const sidebarContentPro = {
+  navMain: [
+    { title: "Dashboard", url: "/", icon: LayoutDashboardIcon },
+    { title: "Scan Now", url: "/scan", icon: CameraIcon },
+    { title: "History", url: "/scan-history", icon: ClipboardListIcon },
+    { title: "Analytics", url: "/analytics", icon: BarChartIcon },
+  ],
+  documents: [
+    { name: "Data Library", url: "/data-library", icon: DatabaseIcon },
+    { name: "Reports", url: "/reports", icon: ClipboardListIcon },
+  ],
+  ai: [
+    { name: "Chat With Doc", url: "/reports", icon: ClipboardListIcon },
+    { name: "Explore AI Models", url: "/subscription", icon: DollarSignIcon },
+  ],
+  navSecondary: [
+    { title: "Settings", url: "/settings", icon: SettingsIcon },
+    { title: "Search", url: "/search", icon: SearchIcon },
+    { title: "Get Help", url: "/help", icon: HelpCircleIcon },
+  ],
+};
+
+// Sidebar content for Business Plan
+const sidebarContentBusiness = {
+  navMain: [
+    { title: "Dashboard", url: "/", icon: LayoutDashboardIcon },
+    { title: "Scan Now", url: "/scan", icon: CameraIcon },
+    { title: "History", url: "/scan-history", icon: ClipboardListIcon },
+    { title: "Analytics", url: "/analytics", icon: BarChartIcon },
+    { title: "Projects", url: "/projects", icon: FolderIcon },
+    { title: "Team", url: "/team", icon: UsersIcon },
+  ],
+  documents: [
+    { name: "Data Library", url: "/data-library", icon: DatabaseIcon },
+    { name: "Reports", url: "/reports", icon: ClipboardListIcon },
+  ],
+  ai: [
+    { name: "Chat With Doc", url: "/reports", icon: ClipboardListIcon },
+    { name: "Explore AI Models", url: "/subscription", icon: DollarSignIcon },
+  ],
+
+  navSecondary: [
+    { title: "Settings", url: "/settings", icon: SettingsIcon },
+    { title: "Search", url: "/search", icon: SearchIcon },
+    { title: "Get Help", url: "/help", icon: HelpCircleIcon },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+  const { subscription } = useUserData(user);
+
+  const plan = subscription?.plan_name ?? "Free";
+
+  let content;
+  switch (plan) {
+    case "Business":
+      content = sidebarContentBusiness;
+      break;
+    case "Pro":
+      content = sidebarContentPro;
+      break;
+    case "Free":
+    default:
+      content = sidebarContentFree;
+      break;
+  }
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -160,21 +132,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <a href="/dashboard">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">
+                  Text Peek Online
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={content.navMain} />
+        <NavDocuments items={content.documents} />
+        <NavAI items={content.ai} />
+        <NavSecondary items={content.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
